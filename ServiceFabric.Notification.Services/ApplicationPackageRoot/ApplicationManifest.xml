@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="ServiceFabric.Notification.ServicesType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <Parameters>
+    <Parameter Name="ServiceFabric.Notification.Broker_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="ServiceFabric.Notification.Broker_PartitionCount" DefaultValue="1" />
+    <Parameter Name="ServiceFabric.Notification.Broker_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="ServiceFabric.Notification.Random_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="ServiceFabric.Notification.Clock_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="ServiceFabric.Notification.Subscriber_InstanceCount" DefaultValue="-1" />
+  </Parameters>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ServiceFabric.Notification.BrokerPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ServiceFabric.Notification.RandomPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ServiceFabric.Notification.ClockPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ServiceFabric.Notification.SubscriberPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <DefaultServices>
+    <Service Name="ServiceFabric.Notification.Broker" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="ServiceFabric.Notification.BrokerType" TargetReplicaSetSize="[ServiceFabric.Notification.Broker_TargetReplicaSetSize]" MinReplicaSetSize="[ServiceFabric.Notification.Broker_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[ServiceFabric.Notification.Broker_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="ServiceFabric.Notification.Random" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="ServiceFabric.Notification.RandomType" InstanceCount="[ServiceFabric.Notification.Random_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="ServiceFabric.Notification.Clock" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="ServiceFabric.Notification.ClockType" InstanceCount="[ServiceFabric.Notification.Clock_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="ServiceFabric.Notification.Subscriber" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="ServiceFabric.Notification.SubscriberType" InstanceCount="[ServiceFabric.Notification.Subscriber_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+  </DefaultServices>
+</ApplicationManifest>

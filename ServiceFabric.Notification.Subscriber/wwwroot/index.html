@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>System Messages</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono" rel="stylesheet">
+    <script src="vue.js"></script>
+</head>
+
+<body>
+<div id="wrapper">
+    <div id="clock">
+        <p class="date">{{ date }}</p>
+        <p class="time">{{ time }}</p>
+        <p class="text">DIGITAL CLOCK with Service Fabrics Notification System</p>
+        <p class="time"></p>
+    </div>
+    <div id="message">
+    </div>
+</div>
+
+
+<script src="signalr.js"></script>
+<script src="jquery.js"></script>
+
+<script type="text/javascript">
+
+    // keeps the connection object
+    var connection = null;
+    // stores the ID from SetInterval
+    var heartBeatTockTimer = 0;
+    // how often should I "tock" the server
+    var heartBeatTockTimerSeconds = 10;
+    // how often should I retry after connection loss?
+    var maxRetryAttempt = 5;
+    // the retry should wait less long then the TockTimer, or calls may overlap
+    var retryWaitSeconds = heartBeatTockTimerSeconds / 2;
+    // how many retry attempts did we have?
+    var currentRetryAttempt = 0;
+    // helper function to wait a few seconds
+    $.wait = function (miliseconds) {
+        var defer = $.Deferred();
+        setTimeout(function () { defer.resolve(); }, miliseconds);
+        return defer;
+    };
+
+    var clock = new Vue({
+        el: '#clock',
+        data: {
+            time: '',
+            date: ''
+        }
+    });
+   
+    var messageLimit = 10;
+
+    var week = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+    function updateSystemMessage(data) {
+        var $messages = document.getElementById('message');
+        var $children = $messages.children;
+
+        var ct = new Date(data.created);
+
+        var p = document.createElement("p");
+        p.className = "text clean";
+        p.innerHTML = formatDateAndTime(ct) + ' - ' + data.node + ' - ' + data.service + ' - ' + data.message;
+
+        $messages.appendChild(p);
+
+        if($children.length > messageLimit) {
+            $children[0].remove();
+        }
+    }
+
+    function updateTime(date) {
+        var cd = new Date(date);
+        clock.time = formatTime(cd);
+        clock.date = formatDate(cd);
+    };
+
+    function formatTime(cd) {
+        return zeroPadding(cd.getHours(), 2) +
+            ':' +
+            zeroPadding(cd.getMinutes(), 2) +
+            ':' +
+            zeroPadding(cd.getSeconds(), 2);
+    }
+    function formatDate(cd) {
+        return zeroPadding(cd.getFullYear(), 4) +
+            '-' +
+            zeroPadding(cd.getMonth() + 1, 2) +
+            '-' +
+            zeroPadding(cd.getDate(), 2) +
+            ' ' +
+            week[cd.getDay()];
+    }
+
+    function formatDateAndTime(cd) {
+        return formatDate(cd) + ' ' + formatTime(cd);
+    }
+
+    function zeroPadding(num, digit) {
+        var zero = '';
+        for (var i = 0; i < digit; i++) {
+            zero += '0';
+        }
+        return (zero + num).slice(-digit);
+    }
+
+    // first routine start of the connection
+    registerSignalRConnection();
+
+    function registerSignalRConnection() {
+        ++currentRetryAttempt;
+        if (currentRetryAttempt > maxRetryAttempt) {
+            console.log("Clearing registerHeartBeatTockTimer");
+            clearInterval(heartBeatTockTimer);
+            heartBeatTockTimer = 0;
+            throw "Retry attempts exceeded.";
+        }
+        if (connection !== null) {
+            console.log("registerSignalRConnection was not null", connection);
+            connection.stop().catch(err => console.log(err));
+        }
+        console.log("Creating new connection");
+
+        connection = new signalR.HubConnectionBuilder().withUrl("/notifications").configureLogging(signalR.LogLevel.Information).build();
+        connection.on("Heartbeat", serverTime => { console.log(serverTime); });
+        connection.on('notifySystemClock', (message) => { updateTime(message.clock); });
+        connection.on('notifySystemMessage', (message) => { updateSystemMessage(message); });
+
+        connection.start().then(() => {
+            console.log("Connection started, starting timer.");
+            registerHeartBeatTockTimer();
+        }).catch(exception => {
+            console.log("Error connecting", exception, connection);
+        });
+    }
+    function registerHeartBeatTockTimer() {
+        // make sure we're registered only once
+        if (heartBeatTockTimer !== 0) return;
+        console.log("Registering registerHeartBeatTockTimer");
+        if (connection !== null)
+            heartBeatTockTimer = setInterval(sendHeartBeatTock, heartBeatTockTimerSeconds * 1000);
+        else
+            console.log("Connection didn't allow registry");
+    }
+
+    function sendHeartBeatTock() {
+        console.log("Standard attempt HeartBeatTock");
+        connection.invoke("HeartBeatTock").then(() => {
+            console.log("HeartbeatTock worked.");
+            })
+            .catch(err => {
+                console.log("HeartbeatTock Standard Error", err);
+                $.wait(retryWaitSeconds * 1000).then(function () {
+                    console.log("executing attempt #" + currentRetryAttempt.toString());
+                    registerSignalRConnection();
+                });
+                console.log("Current retry attempt: ", currentRetryAttempt);
+            });
+    }
+</script>
+</body>
+
+</html>
