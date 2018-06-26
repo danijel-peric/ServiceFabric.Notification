@@ -12,3 +12,5 @@ not that if you publish ServiceFabric.Notification.Subscriber more then one inst
 
 note that ServiceFabric.PubSubActors and ServiceFabric.PubSubActors.Interfaces are converted to net standard, because of Stateless services which are built in net core
 and broker service is using v2 remoting
+
+![alt text](https://github.com/danijel-peric/ServiceFabric.Notification/blob/master/index.jpg)
