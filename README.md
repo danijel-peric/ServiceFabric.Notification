@@ -1,7 +1,7 @@
 # ServiceFabric.Notification
 Usage example of ServiceFabric Pub/Sub using ServiceFabric.PubSubActors https://github.com/loekd/ServiceFabric.PubSubActors
 
-Just simple demonstration of using https://github.com/loekd/ServiceFabric.PubSubActors
+Just simple demonstration of using https://github.com/loekd/ServiceFabric.PubSubActors (version 7.3.7)
 
 2 Stateless Publisher
 1 Broker
