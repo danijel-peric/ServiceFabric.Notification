@@ -2,7 +2,7 @@
 using System.Diagnostics.Tracing;
 using System.Fabric;
 
-namespace ServiceFabric.Notification.Clock
+namespace ServiceFabric.Notification
 {
     [EventSource(Name = "ServiceFabric.Notification.Clock")]
 internal sealed class ServiceEventSource : EventSource

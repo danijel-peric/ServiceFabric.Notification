@@ -7,23 +7,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using ServiceFabric.Notification.Shared;
 using ServiceFabric.PubSubActors.Helpers;
+using ServiceFabric.PubSubActors.Publishers;
 using ServiceFabric.RandomGenerator;
 
-namespace ServiceFabric.Notification.Random
+namespace ServiceFabric.Notification
 {
     internal sealed class Random : StatelessService
     {
         private readonly IRandomGenerator randomGenerator;
-        private readonly IPublisherServiceHelper publisherService;
+        private readonly IMessagePublisher messagePublisher;
 
         public Random(StatelessServiceContext context)
             : base(context)
         {
             randomGenerator = new RandomGenerator.RandomGenerator(s => ServiceEventSource.Current.ServiceMessage(Context, s));
 
-            publisherService = new PublisherServiceHelper();
+            messagePublisher = new MessagePublisher();
         }
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
@@ -67,7 +67,7 @@ namespace ServiceFabric.Notification.Random
 
                 ServiceEventSource.Current.ServiceMessage(Context, $"Publishing message: {nameof(SystemMessageEvent)}");
 
-                await publisherService.PublishMessageAsync(this, m);
+                await messagePublisher.PublishMessageAsync(m);
             }
             catch (Exception e)
             {

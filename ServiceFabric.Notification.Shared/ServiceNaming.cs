@@ -1,5 +1,5 @@
 ﻿
-namespace ServiceFabric.Notification.Shared
+namespace ServiceFabric.Notification
 {
     public class ServiceNaming
     {

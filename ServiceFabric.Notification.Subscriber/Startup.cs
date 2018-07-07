@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using ServiceFabric.Notification.Subscriber.Hubs;
+using ServiceFabric.Notification.Hubs;
 using StackExchange.Redis;
 
-namespace ServiceFabric.Notification.Subscriber
+namespace ServiceFabric.Notification
 {
     public class Startup
     {

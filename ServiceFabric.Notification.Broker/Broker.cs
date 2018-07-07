@@ -2,7 +2,7 @@
 using System.Fabric;
 using ServiceFabric.PubSubActors;
 
-namespace ServiceFabric.Notification.Broker
+namespace ServiceFabric.Notification
 {
     /// <summary>
     /// An instance of this class is created for each service replica by the Service Fabric runtime.

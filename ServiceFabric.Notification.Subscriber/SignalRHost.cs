@@ -4,7 +4,6 @@ using System.Fabric;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Abp.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,20 +11,21 @@ using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using ServiceFabric.Notification.Shared;
-using ServiceFabric.Notification.Subscriber.Hubs;
+using ServiceFabric.Notification.Hubs;
+using ServiceFabric.PubSubActors;
+using ServiceFabric.PubSubActors.Consumers;
 using ServiceFabric.PubSubActors.Helpers;
 using ServiceFabric.PubSubActors.Interfaces;
 using ServiceFabric.PubSubActors.SubscriberServices;
 
-namespace ServiceFabric.Notification.Subscriber
+namespace ServiceFabric.Notification
 {
     /// <summary>
     /// The FabricRuntime creates an instance of this class for each service type instance. 
     /// </summary>
     internal sealed class SignalRHost : StatelessService, ISubscribingSignalRService
     {
-        private readonly ISubscriberServiceHelper subscriberService;
+        private IMessageConsumer messageConsumer;
         private readonly Dictionary<string, Type> messageTypes;
 
         public SignalRHost(StatelessServiceContext context)
@@ -37,9 +37,6 @@ namespace ServiceFabric.Notification.Subscriber
                 {typeof(SystemMessageEvent).FullName, typeof(SystemMessageEvent)}
             };
 
-            var brokerLocator = new BrokerServiceLocator();
-
-            subscriberService = new SubscriberServiceHelper(brokerLocator);
         }
 
         /// <summary>
@@ -82,6 +79,8 @@ namespace ServiceFabric.Notification.Subscriber
 
         protected override async Task OnOpenAsync(CancellationToken cancellationToken)
         {
+            messageConsumer = this.CreateConsumer(Partition.PartitionInfo);
+
             cancellationToken.ThrowIfCancellationRequested();
 
             foreach (var messageType in messageTypes.Values)
@@ -124,7 +123,7 @@ namespace ServiceFabric.Notification.Subscriber
                 {
                     ServiceEventSource.Current.ServiceMessage(this.Context, "Sending Register message {0} to broker service {1}",  messageType, ServiceNaming.BrokerServiceAddress);
 
-                    await subscriberService.RegisterMessageTypeAsync(this, messageType);
+                    await messageConsumer.RegisterMessageAsync(messageType);
 
                     ServiceEventSource.Current.ServiceMessage(Context, $"Registered Service:'{nameof(SignalRHost)}' Instance:'{Context.InstanceId}' as Subscriber.");
                     break;
@@ -183,7 +182,7 @@ namespace ServiceFabric.Notification.Subscriber
             {
                 ServiceEventSource.Current.ServiceMessage(this.Context, "Sending Register message {0} to broker service {1}", messageType, ServiceNaming.BrokerServiceAddress);
 
-                await subscriberService.RegisterMessageTypeAsync(this, messageType);
+                await messageConsumer.RegisterMessageAsync(messageType);
             }
         }
 
@@ -191,7 +190,7 @@ namespace ServiceFabric.Notification.Subscriber
         {
             foreach (var messageType in messageTypes.Values)
             {
-                await subscriberService.UnregisterMessageTypeAsync(this, messageType, true);
+                await messageConsumer.UnregisterMessageAsync(messageType, true);
             }
         }
     }

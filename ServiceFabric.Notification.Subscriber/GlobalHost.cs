@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ServiceFabric.Notification.Subscriber
+namespace ServiceFabric.Notification
 {
     public class GlobalHost
     {

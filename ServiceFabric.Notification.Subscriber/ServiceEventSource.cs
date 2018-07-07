@@ -4,7 +4,7 @@ using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ServiceFabric.Notification.Subscriber
+namespace ServiceFabric.Notification
 {
     [EventSource(Name = "ServiceFabric.Notification.SubscriberSignalRHost")]
     internal sealed class ServiceEventSource : EventSource

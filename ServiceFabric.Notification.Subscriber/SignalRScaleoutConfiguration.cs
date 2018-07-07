@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Fabric;
 
-namespace ServiceFabric.Notification.Subscriber
+namespace ServiceFabric.Notification
 {
     public class SignalRScaleoutConfiguration
     {

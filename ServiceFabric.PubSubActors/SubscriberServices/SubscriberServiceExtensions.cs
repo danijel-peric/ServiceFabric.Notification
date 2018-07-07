@@ -41,11 +41,22 @@ namespace ServiceFabric.PubSubActors.SubscriberServices
         }
 
         /// <summary>
-        /// Deserializes the provided <paramref name="message"/> Payload into an intance of type <typeparam name="TResult"></typeparam>
+        /// Deserializes the provided <paramref name="message"/> Payload into an intance of type <typeparam name="type"></typeparam>
         /// </summary>
-        /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
         public static object Deserialize(this StatelessService service, MessageWrapper message, Type type)
+        {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            if (string.IsNullOrWhiteSpace(message.Payload)) throw new ArgumentNullException(nameof(message.Payload));
+
+            var payload = JsonConvert.DeserializeObject(message.Payload, type);
+            return payload;
+        }
+        /// <summary>
+        /// Deserializes the provided <paramref name="message"/> Payload into an intance of type <typeparam name="type"></typeparam>
+        /// </summary>
+        /// <returns></returns>
+        public static object Deserialize(this StatefulServiceBase service, MessageWrapper message, Type type)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             if (string.IsNullOrWhiteSpace(message.Payload)) throw new ArgumentNullException(nameof(message.Payload));

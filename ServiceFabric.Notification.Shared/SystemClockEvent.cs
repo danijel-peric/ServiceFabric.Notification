@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace ServiceFabric.Notification.Shared
+namespace ServiceFabric.Notification
 {
     [DataContract]
     public class SystemClockEvent

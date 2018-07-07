@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace ServiceFabric.Notification.Random
+namespace ServiceFabric.Notification
 {
     internal static class Program
     {

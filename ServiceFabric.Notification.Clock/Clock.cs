@@ -5,19 +5,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using ServiceFabric.Notification.Shared;
-using ServiceFabric.PubSubActors.Helpers;
+using ServiceFabric.PubSubActors.Publishers;
 
-namespace ServiceFabric.Notification.Clock
+namespace ServiceFabric.Notification
 {
     internal sealed class Clock : StatelessService
     {
-        private readonly IPublisherServiceHelper publisherService;
+        private readonly IMessagePublisher messagePublisher;
 
         public Clock(StatelessServiceContext context)
             : base(context)
         {
-            publisherService = new PublisherServiceHelper();
+            messagePublisher = new MessagePublisher();
         }
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
@@ -41,7 +40,7 @@ namespace ServiceFabric.Notification.Clock
         {
             ServiceEventSource.Current.ServiceMessage(Context, $"Publishing message: {nameof(SystemClockEvent)}");
 
-            await publisherService.PublishMessageAsync(this, clock);
+            await messagePublisher.PublishMessageAsync(clock);
         }
     }
 }

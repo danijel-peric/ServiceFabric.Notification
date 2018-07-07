@@ -3,7 +3,7 @@ using System.Diagnostics.Tracing;
 using System.Fabric;
 using System.Linq;
 
-namespace ServiceFabric.Notification.Random
+namespace ServiceFabric.Notification
 {
     [EventSource(Name = "ServiceFabric.Notification.Services-ServiceFabric.Notification.Random")]
     internal sealed class ServiceEventSource : EventSource

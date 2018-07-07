@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <RootNamespace>ServiceFabric.Notification</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

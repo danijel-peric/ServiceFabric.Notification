@@ -2,7 +2,7 @@
 using System.Diagnostics.Tracing;
 using System.Fabric;
 
-namespace ServiceFabric.Notification.Broker
+namespace ServiceFabric.Notification
 {
     [EventSource(Name = "ServiceFabric.Notification.Broker")]
     internal sealed class ServiceEventSource : EventSource
