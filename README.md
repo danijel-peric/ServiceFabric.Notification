@@ -6,7 +6,7 @@ Just simple demonstration of using https://github.com/loekd/ServiceFabric.PubSub
 2 Stateless Publisher
 1 Broker
 1 Stateless Subscriber (ASP.NET core with singalR 2) to display realtime clock which is published by ServiceFabric.Notification.Clock and
-random messages published by ServiceFabric.Notification.Random every 200ms
+random messages published by ServiceFabric.Notification.Random every 200 ms
 
 not that if you publish ServiceFabric.Notification.Subscriber more then one instance, you need to use SignalR Scaleout with redist, defined in /PackageRoot/Config/Settings.xml
 
